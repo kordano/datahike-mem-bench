@@ -87,7 +87,13 @@
             (log/info "tx count" n))
           (d/transact conn {:tx-data [{:block/text (rand-str (rand-int 10000))
                                        :block/id   n}]}))
-        (log/info "Done")
-        (System/exit 0))
+        (log/info "Done"))
       (log/error errors))))
 
+
+(comment
+
+
+  (-main "-t" "1000")
+
+  )
