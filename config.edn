@@ -1,0 +1,5 @@
+{:store {:backend :file
+         :path "/tmp/mem-bench"}
+ :keep-history? true
+ :attribute-refs? false
+ :schema-flexibility :write}

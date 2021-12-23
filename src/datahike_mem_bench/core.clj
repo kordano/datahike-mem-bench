@@ -63,9 +63,9 @@
     :default "./log.out"
     :default-desc "default to ./log.out"
     :parse-fn #(String. %)]
-   ["-s" "--store store path"
-    :default "/tmp/mem-bench"
-    :default-desc "default to /tmp/mem-bench"
+   ["-c" "--config datahike config"
+    :default "./config.edn"
+    :default-desc "default to ./config.edn"
     :parse-fn #(String. %)]
    ["-t" "--txs transactions"
     :default 50
@@ -78,14 +78,15 @@
   (let [{:keys [options errors]} (parse-opts args cli-opts)]
     (if (nil? errors)
       (let [_ (setup-logging (:log-file options))
-            conn (setup-conn (assoc-in cfg [:store :path] (:store options)))]
+            cfg (-> options :config slurp read-string)
+            conn (setup-conn cfg)]
         (log/info "Options:" options)
         (log/info "Base eavt count" (count @conn))
         (log/info "Start transacting...")
         (doseq [n (range (:txs options))]
           (when (= 0 (mod n 1000))
             (log/info "tx count" n))
-          (d/transact conn {:tx-data [{:block/text (rand-str (rand-int 10000))
+          (d/transact conn {:tx-data [{:block/text "transaction"
                                        :block/id   n}]}))
         (log/info "Done"))
       (log/error errors))))
@@ -93,7 +94,6 @@
 
 (comment
 
-
-  (-main "-t" "1000")
+  (-main "-c" "./config.edn" "-t" "10000" "-l" "./some_log.out")
 
   )
