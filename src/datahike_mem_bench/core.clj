@@ -94,6 +94,6 @@
 
 (comment
 
-  (-main "-c" "./config.edn" "-t" "10000" "-l" "./some_log.out")
+  (-main "-c" "./config.edn" "-t" "100000" "-l" "./some_log.out")
 
   )
