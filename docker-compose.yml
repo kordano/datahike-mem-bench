@@ -11,4 +11,4 @@ services:
     ports:
       - "5435:5432"
     volumes:
-      - /home/konrad/data/roam/pg_data:/var/lib/postgresql/data
+      - /tmp/pg_data:/var/lib/postgresql/data
