@@ -2,6 +2,7 @@
   (:gen-class)
   (:require [datahike.api :as d]
             [clojure.tools.cli :refer [parse-opts]]
+            [datahike-jdbc.core]
             [taoensso.timbre :as log]
             [taoensso.timbre.appenders.core :as appenders])
   (:import [java.util Random]))
@@ -94,6 +95,6 @@
 
 (comment
 
-  (-main "-c" "./config.edn" "-t" "100000" "-l" "./some_log.out")
+  (-main "-c" "./pg_config.edn" "-t" "100000" "-l" "./pg_log.out")
 
   )

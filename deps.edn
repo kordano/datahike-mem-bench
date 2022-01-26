@@ -1,6 +1,7 @@
 {:paths   ["src"]
  :deps    {org.clojure/clojure         {:mvn/version "1.10.3"}
            org.clojure/tools.cli       {:mvn/version "1.0.206"}
-           io.replikativ/datahike      {:mvn/version "0.4.1481"}}
+           io.replikativ/datahike      {:mvn/version "0.4.1481"}
+           io.replikativ/datahike-jdbc {:mvn/version "0.1.2-SNAPSHOT"}}
  :aliases {:uberjar {:extra-deps {uberdeps/uberdeps {:mvn/version "1.1.2"}}
                      :main-opts  ["-m" "uberdeps.uberjar" "--target" "target/bench.jar"]}}}
