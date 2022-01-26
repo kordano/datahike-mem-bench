@@ -1,0 +1,14 @@
+version: '3.1'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: datahike
+      POSTGRES_USER: replikativ
+      POSTGRES_DB: mem_bench
+    ports:
+      - "5435:5432"
+    volumes:
+      - /home/konrad/data/roam/pg_data:/var/lib/postgresql/data
