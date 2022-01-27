@@ -9,16 +9,11 @@ clj -Muberjar
 
 Run with 
 ```
-java -cp target/bench.jar clojure.main -m datahike-mem-bench.core -t 1000 -s /tmp/bench -l /tmp/log.log
-```
-
-Monitor memory usage with process `<pid>` through `jps`:
-```
-jstat -gc -t <pid> 500
+clj -J-XX:+UseG1GC -J-XX:InitialHeapSize=2g -J-XX:MaxHeapSize=4g -J-XX:+UseStringDeduplication -J-XX:MaxTenuringThreshold=1 -J-Xlog:gc=debug:file=/root/datahike-mem-bench/gc.log:time,uptime,level,tags:filecount=5,filesize=100m -m datahike-mem-bench.core -c /root/datahike-mem-bench/pg_config.edn -t 1000000 -l /root/datahike-mem-bench/pg_log.out
 ```
 
 ## License
 
-Copyright ©2021 Konrad Kühne
+Copyright ©2022 Konrad Kühne
 
 Licensed under Eclipse Public License (see LICENSE).
