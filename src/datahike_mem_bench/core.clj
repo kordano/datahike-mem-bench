@@ -50,13 +50,6 @@
         (.append ^StringBuilder stringBuilder ch)))
     (.toString ^StringBuilder stringBuilder)))
 
-(defmacro timed
-  "Evaluates expr. Returns the value of expr and the time in a map."
-  [expr]
-  `(let [start# (. System (nanoTime))
-         ret# ~expr]
-     {:res ret# :t (/ (double (- (. System (nanoTime)) start#)) 1000000.0)}))
-
 (def cli-opts
   [["-h" "--help" "Print this help"
     :default false]
@@ -68,33 +61,64 @@
     :default "./config.edn"
     :default-desc "default to ./config.edn"
     :parse-fn #(String. %)]
+   ["-u" "--upserts upsert count"
+    :default 0
+    :default-desc "default to 0"
+    :parse-fn #(Integer. %)
+    :validate [#(< % 10000000) "Reached maximum upserts."]]
+   ["-x" "--text text length"
+    :default 10
+    :default-desc "default to 10"
+    :parse-fn #(Integer. %)]
    ["-t" "--txs transactions"
     :default 50
     :default-desc "fifty transactions per default"
     :parse-fn #(Integer. %)
-    :validate [#(< % 10000000) "Reached the maximum."]]])
-
+    :validate [#(< % 10000000) "Reached the maximum transactions."]]])
 
 (defn -main [& args]
   (let [{:keys [options errors]} (parse-opts args cli-opts)]
     (if (nil? errors)
       (let [_ (setup-logging (:log-file options))
             cfg (-> options :config slurp read-string)
-            conn (setup-conn cfg)]
+            conn (setup-conn cfg)
+            {:keys [txs upserts text]} options
+            tx-upserts (if (pos? upserts)
+                         (long (Math/floor (/ txs upserts)))
+                         txs)]
         (log/info "Options:" options)
         (log/info "Base eavt count" (count @conn))
         (log/info "Start transacting...")
-        (doseq [n (range (:txs options))]
+        (doseq [n (range txs)]
           (when (= 0 (mod n 1000))
             (log/info "tx count" n))
-          (d/transact conn {:tx-data [{:block/text "transaction"
-                                       :block/id   n}]}))
+          (d/transact conn {:tx-data [{:block/text (rand-str text)
+                                       :block/id   (mod n tx-upserts)}]}))
         (log/info "Done"))
       (log/error errors))))
 
-
 (comment
 
-  (-main "-c" "./pg_config.edn" "-t" "100000" "-l" "./pg_log.out")
+  (def cfg {:store {:backend :mem
+                    :id "bench"}
+            :keep-history? true
+            :schema-flexibility :read})
+
+  (def conn (setup-conn cfg))
+
+  (:meta @conn)
+
+  {:block/text (rand-str 100)
+   :block/id 5}
+
+
+  (-main "-c" "./config.edn" "-t" "1000" "-l"  "./file_log.out")
+
+  (def conn 
+    (-> "./config.edn" slurp read-string d/connect))
+
+  (d/q '[:find (count ?e)
+         :where
+         [?e :block/text ?t _ false]] (d/history @conn))
 
   )
